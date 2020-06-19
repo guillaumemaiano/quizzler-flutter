@@ -57,6 +57,20 @@ class _QuizPageState extends State<QuizPage> {
   void nextQuestion() {
     var next = current + 1;
     if (next >= questions.length) {
+      showDialog(
+          context: context,
+          builder: (_) => new AlertDialog(
+            title: new Text("Résultat:"),
+            content: Text("Faut parser le machin et ça me gonfle... ou revoir le score keeper. Je ferais ça après."),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Recommencer!'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          ));
       current = 0;
       scoreKeeper = [];
     } else {
