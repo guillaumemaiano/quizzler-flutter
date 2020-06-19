@@ -34,7 +34,21 @@ class _QuizPageState extends State<QuizPage> {
     'Le point le plus profond des océans est plus de douze fois plus profond que le plus haut bâtiment humain n\'est haut.',
   ];
 
-  String currentQuestion() => questions.first;
+  int current = 0;
+
+  String currentQuestion() {
+    return questions[current];
+  }
+
+  void nextQuestion() {
+    var next = current + 1;
+    if (next >= questions.length) {
+      current = 0;
+      scoreKeeper = [];
+    } else {
+      current = next;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +94,7 @@ class _QuizPageState extends State<QuizPage> {
                     color: Colors.green
                   ),
                 );
+                nextQuestion();
                 });
               },
             ),
@@ -106,6 +121,7 @@ class _QuizPageState extends State<QuizPage> {
                       color: Colors.red,
                     ),
                   );
+                  nextQuestion();
                 });
               },
             ),
