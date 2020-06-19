@@ -25,6 +25,17 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
+  List <Widget> scoreKeeper = [
+  ];
+
+  List<String> questions = [
+    'La Tour de Babel a vraiment existé.',
+    'Les éléphants ont du mal à descendre les pentes aïgues',
+    'Le point le plus profond des océans est plus de douze fois plus profond que le plus haut bâtiment humain n\'est haut.',
+  ];
+
+  String currentQuestion() => questions.first;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -37,7 +48,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                'This is where the question text will go.',
+                currentQuestion(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25.0,
@@ -61,7 +72,15 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
+                setState(() {
                 //The user picked true.
+                scoreKeeper.add(
+                  Icon(
+                    Icons.check,
+                    color: Colors.green
+                  ),
+                );
+                });
               },
             ),
           ),
@@ -80,11 +99,22 @@ class _QuizPageState extends State<QuizPage> {
               ),
               onPressed: () {
                 //The user picked false.
+                setState(() {
+                  scoreKeeper.add(
+                    Icon(
+                      Icons.close,
+                      color: Colors.red,
+                    ),
+                  );
+                });
               },
             ),
           ),
         ),
-        //TODO: Add a Row here as your score keeper
+        // score keeper
+        Row(
+          children: scoreKeeper
+        )
       ],
     );
   }
