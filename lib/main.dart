@@ -26,11 +26,11 @@ class QuizPage extends StatefulWidget {
 
 class Question {
   String question;
-  bool answer;
+  bool expect;
 
   Question({String phrase, bool answer}) {
     question = phrase;
-    answer = answer;
+    expect = answer;
   }
 }
 
@@ -65,7 +65,10 @@ class _QuizPageState extends State<QuizPage> {
   }
 
   void displayResponse({bool userChoice}) {
-    if (userChoice) {
+    var q = questions[current].question;
+    var exp = questions[current].expect;
+    print("Question: $q, expected: $exp, userpick: $userChoice"  );
+    if (userChoice == questions[current].expect) {
       scoreKeeper.add(
         Icon(Icons.check, color: Colors.green),
       );
