@@ -23,24 +23,29 @@ class QuizPage extends StatefulWidget {
   @override
   _QuizPageState createState() => _QuizPageState();
 }
+
 class Question {
   String question;
   bool answer;
 
-  Question( { String phrase, bool answer}) {
+  Question({String phrase, bool answer}) {
     question = phrase;
     answer = answer;
   }
 }
 
 class _QuizPageState extends State<QuizPage> {
-  List <Widget> scoreKeeper = [
-  ];
+  List<Widget> scoreKeeper = [];
 
   List<Question> questions = [
     Question(phrase: 'La Tour de Babel a vraiment existé.', answer: true),
-    Question(phrase: 'Le point le plus profond des océans est plus de douze fois plus profond que le plus haut bâtiment humain n\'est haut.', answer: true),
-    Question(phrase: 'Les éléphants ont du mal à descendre les pentes aïgues', answer: true),
+    Question(
+        phrase:
+            'Le point le plus profond des océans est plus de douze fois plus profond que le plus haut bâtiment humain n\'est haut.',
+        answer: true),
+    Question(
+        phrase: 'Les éléphants ont du mal à descendre les pentes aïgues',
+        answer: true),
   ];
 
   int current = 0;
@@ -56,6 +61,21 @@ class _QuizPageState extends State<QuizPage> {
       scoreKeeper = [];
     } else {
       current = next;
+    }
+  }
+
+  void displayResponse({bool userChoice}) {
+    if (userChoice) {
+      scoreKeeper.add(
+        Icon(Icons.check, color: Colors.green),
+      );
+    } else {
+      scoreKeeper.add(
+        Icon(
+          Icons.close,
+          color: Colors.red,
+        ),
+      );
     }
   }
 
@@ -96,14 +116,9 @@ class _QuizPageState extends State<QuizPage> {
               ),
               onPressed: () {
                 setState(() {
-                //The user picked true.
-                scoreKeeper.add(
-                  Icon(
-                    Icons.check,
-                    color: Colors.green
-                  ),
-                );
-                nextQuestion();
+                  //The user picked true.
+                  displayResponse(userChoice: true);
+                  nextQuestion();
                 });
               },
             ),
@@ -124,12 +139,7 @@ class _QuizPageState extends State<QuizPage> {
               onPressed: () {
                 //The user picked false.
                 setState(() {
-                  scoreKeeper.add(
-                    Icon(
-                      Icons.close,
-                      color: Colors.red,
-                    ),
-                  );
+                  displayResponse(userChoice: false);
                   nextQuestion();
                 });
               },
@@ -137,9 +147,7 @@ class _QuizPageState extends State<QuizPage> {
           ),
         ),
         // score keeper
-        Row(
-          children: scoreKeeper
-        )
+        Row(children: scoreKeeper)
       ],
     );
   }
