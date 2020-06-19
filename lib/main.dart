@@ -23,21 +23,30 @@ class QuizPage extends StatefulWidget {
   @override
   _QuizPageState createState() => _QuizPageState();
 }
+class Question {
+  String question;
+  bool answer;
+
+  Question( { String phrase, bool answer}) {
+    question = phrase;
+    answer = answer;
+  }
+}
 
 class _QuizPageState extends State<QuizPage> {
   List <Widget> scoreKeeper = [
   ];
 
-  List<String> questions = [
-    'La Tour de Babel a vraiment existé.',
-    'Les éléphants ont du mal à descendre les pentes aïgues',
-    'Le point le plus profond des océans est plus de douze fois plus profond que le plus haut bâtiment humain n\'est haut.',
+  List<Question> questions = [
+    Question(phrase: 'La Tour de Babel a vraiment existé.', answer: true),
+    Question(phrase: 'Le point le plus profond des océans est plus de douze fois plus profond que le plus haut bâtiment humain n\'est haut.', answer: true),
+    Question(phrase: 'Les éléphants ont du mal à descendre les pentes aïgues', answer: true),
   ];
 
   int current = 0;
 
   String currentQuestion() {
-    return questions[current];
+    return questions[current].question;
   }
 
   void nextQuestion() {
