@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'game_engine.dart';
 
 void main() => runApp(Quizzler());
 
@@ -24,76 +25,60 @@ class QuizPage extends StatefulWidget {
   _QuizPageState createState() => _QuizPageState();
 }
 
-class Question {
-  String question;
-  bool expect;
-
-  Question({String phrase, bool answer}) {
-    question = phrase;
-    expect = answer;
-  }
-}
-
 class _QuizPageState extends State<QuizPage> {
-  List<Widget> scoreKeeper = [];
+  List<Widget> _progressDisplayer = [];
+  GameEngine _engine;
 
-  List<Question> questions = [
-    Question(phrase: 'La Tour de Babel a vraiment existé.', answer: true),
-    Question(
-        phrase:
-            'Le point le plus profond des océans est plus de douze fois plus profond que le plus haut bâtiment humain n\'est haut.',
-        answer: true),
-    Question(
-        phrase: 'Les éléphants ont du mal à descendre les pentes aïgues',
-        answer: true),
-  ];
-
-  int current = 0;
-
-  String currentQuestion() {
-    return questions[current].question;
+  _QuizPageState() {
+    _engine = GameEngine(this);
   }
 
-  void nextQuestion() {
-    var next = current + 1;
-    if (next >= questions.length) {
-      showDialog(
-          context: context,
-          builder: (_) => new AlertDialog(
-            title: new Text("Résultat:"),
-            content: Text("Faut parser le machin et ça me gonfle... ou revoir le score keeper. Je ferais ça après."),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('Recommencer!'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          ));
-      current = 0;
-      scoreKeeper = [];
-    } else {
-      current = next;
-    }
+// Display update methods
+  void _displayResults() async {
+    await showDialog(
+        context: context,
+        builder: (_) => new AlertDialog(
+              title: new Text("Résultat:"),
+              content: Text(_engine.results()),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('Recommencer!'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            ));
+    _progressDisplayer = [];
+    setState(() {
+      reset();
+    });
   }
 
-  void displayResponse({bool userChoice}) {
-    var q = questions[current].question;
-    var exp = questions[current].expect;
-    print("Question: $q, expected: $exp, userpick: $userChoice"  );
-    if (userChoice == questions[current].expect) {
-      scoreKeeper.add(
+  void _displayResponse({bool userChoice}) {
+    if (_engine.validateResponse(userChoice: userChoice)) {
+      _progressDisplayer.add(
         Icon(Icons.check, color: Colors.green),
       );
     } else {
-      scoreKeeper.add(
+      _progressDisplayer.add(
         Icon(
           Icons.close,
           color: Colors.red,
         ),
       );
     }
+  }
+
+  Widget questionBuilder() {
+    return Text(
+      _engine.currentQuestion(),
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: 25.0,
+        color: Colors.white,
+      ),
+    );
   }
 
   @override
@@ -106,16 +91,7 @@ class _QuizPageState extends State<QuizPage> {
           flex: 5,
           child: Padding(
             padding: EdgeInsets.all(10.0),
-            child: Center(
-              child: Text(
-                currentQuestion(),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 25.0,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+            child: Center(child: questionBuilder()),
           ),
         ),
         Expanded(
@@ -134,8 +110,9 @@ class _QuizPageState extends State<QuizPage> {
               onPressed: () {
                 setState(() {
                   //The user picked true.
-                  displayResponse(userChoice: true);
-                  nextQuestion();
+                  _displayResponse(userChoice: true);
+                  // decouple UI update and engine -- though ideally I'd like something more responsive, eg the displayer should display the engine's knowledge at any given time rather than hold what's essentially a secondary KB
+                  _engine.storeResponse(userChoice: true);
                 });
               },
             ),
@@ -156,22 +133,26 @@ class _QuizPageState extends State<QuizPage> {
               onPressed: () {
                 //The user picked false.
                 setState(() {
-                  displayResponse(userChoice: false);
-                  nextQuestion();
+                  _displayResponse(userChoice: false);
+                  // see above
+                  _engine.storeResponse(userChoice: false);
                 });
               },
             ),
           ),
         ),
         // score keeper
-        Row(children: scoreKeeper)
+        Row(children: _progressDisplayer)
       ],
     );
   }
-}
 
-/*
-question1: 'You can lead a cow down stairs but not up stairs.', false,
-question2: 'Approximately one quarter of human bones are in the feet.', true,
-question3: 'A slug\'s blood is green.', true,
-*/
+  // Messaging
+  void gameEnded() {
+    _displayResults();
+  }
+
+  void reset() {
+    _engine.resetGame();
+  }
+}
